@@ -115,6 +115,10 @@ class ygfeatures(ygcursors):
             "insert ignore into features ({}) values ({})".format(fieldnames,placeholders), 
             fieldvals
         )
+        upd.execute(
+            "update features set retweet_count=%s,favorite_count=%s,combined_count=%s where id=%s",
+            (features['retweet_count'],features['favorite_count'],features['combined_count'],features['id'])
+        )
         upd.close()
         self._commit()
         
@@ -160,7 +164,7 @@ class ygfeatures(ygcursors):
                 rawtext += " "
                 rawtext += data['retweeted_status']['text'].encode('ascii','replace')
         yglog.vprint(rawtext)
-        words = rawtext
+        words = rawtext.lower()
         words = re.sub(r'https?://\S*','',words)
         words = re.sub(r'&amp;','and',words)
         words = re.sub(r'&quot;','"',words)
@@ -170,23 +174,28 @@ class ygfeatures(ygcursors):
         words = re.sub(r'[!?\.]+',' ',words) # may want to tag end of sentence? - clash with 'replace's ?s
         words = re.sub(r'[,;:\-\~\$\%\^\&\*\(\)\{\}\[\]\|\\<>/]', ' ', words)
         words = re.sub(r'\s+', ' ', words)
+        # a cliches table ?
+        words = re.sub(r'need to know','need_to_know', words)
         wordlist = words.split()
         yglog.vprint(tweetid,wordlist)
 
         tweetbigrams = {}
         tweetwords = {}
-        savedwords= []
+        savedterms= {}
+        WORDWEIGHT = 1
+        BIGRAMWEIGHT = 2
         prevword = None
 
         for word in wordlist:
             if word in stopwords: continue
 
-            savedwords.append(word)
+            savedterms[word] = WORDWEIGHT
 
             if prevword is not None:
                 bigram = "{} {}".format(prevword, word)
                 if bigram not in tweetbigrams: tweetbigrams[bigram] = 0
                 tweetbigrams[bigram] += 1
+                savedterms[bigram] = BIGRAMWEIGHT
 
             if word not in tweetwords: tweetwords[word] = 0
             tweetwords[word] += 1
@@ -198,10 +207,11 @@ class ygfeatures(ygcursors):
             'id': data['id'],
             'user': data['user'],
             'rawtext': rawtext,
-            'words': json.dumps(savedwords),
+            'words': json.dumps(savedterms),
             'lang': data['lang'],
             'favorite_count': data['favorite_count'],
             'retweet_count': data['retweet_count'],
+            'combined_count': int(data['retweet_count']) + int(data['favorite_count']),
             'created_at': time.strftime('%Y-%m-%d %H:%M:%S', 
                     time.strptime(data['created_at'],'%a %b %d %H:%M:%S +0000 %Y'))
         }

@@ -66,7 +66,6 @@ class ygdbscan(ygcursors):
             seen[id1] = True
             neighbours = self.get_neighbours(id1)
             if len(neighbours) < self.minsz:
-                # yglog.vprint(id1,"has less than",self.minsz,"neighbours")
                 self.noise[id1] = True
             else:
                 self.inc_cluster(id1)
@@ -93,7 +92,7 @@ class ygdbscan(ygcursors):
         self.get_clustertweets()
         self.get_stats()
 
-    def get_interesting(self, minscore=None, scorekey='maxscores'):
+    def get_interesting(self, percentile=None, minscore=None, scorekey='maxscores'):
         """
         given a minimum score and key to search in return the top tweets for each cluster found
         """
@@ -107,9 +106,15 @@ class ygdbscan(ygcursors):
         if minscore is None:
             sortscores = sorted(scores)
             N = len(sortscores)
-            if N >= 20: cutoff = int(math.floor(N * 0.9))
-            elif N >= 10: cutoff = int(math.floor(N* 0.8))
-            else: cutoff = int(math.floor(N* 0.5))
+            if percentile is None:
+                if N >= 200: cutoff = int(math.floor(N * 0.97))
+                elif N >= 90: cutoff = int(math.floor(N * 0.95))
+                elif N >= 50: cutoff = int(math.floor(N * 0.92))
+                elif N >= 20: cutoff = int(math.floor(N * 0.9))
+                elif N >= 10: cutoff = int(math.floor(N * 0.8))
+                else: cutoff = int(math.floor(N * 0.5))
+            else:
+                cutoff = int(math.floor(N * percentile))
             minscore = sortscores[cutoff]
             yglog.vprint("cutoff",cutoff,"N",N,"minscore",minscore,"from",sortscores)
 
@@ -261,6 +266,7 @@ class ygdbscan(ygcursors):
                     )
                     row = get.fetchone()
                     get.close()
+                    if row is None: continue
                     try:
                         root_similarity = self.pairs[rootid][tweetid]
                     except:
@@ -269,6 +275,8 @@ class ygdbscan(ygcursors):
                     created_at = '{:%Y-%m-%d %H:%M:%S}'.format(tweet.pop(0))
                     clustertweets[cl].append({
                         'root': rootid,
+                        'epsilon': self.epsilon,
+                        'minsz': self.minsz,
                         'root_similarity': root_similarity,
                         'id': tweetid,
                         'words': tweet.pop(0),
@@ -296,8 +304,8 @@ class ygdbscan(ygcursors):
         minid = row[0]
         yglog.vprint("starting with id",minid)
         getpairs.execute(
-            "select id1,id2,jaccard+links sim from similarity where id1 > %s",
-            (minid,)
+            "select id1,id2,jaccard+links sim from similarity where id1 > %s and jaccard+links >= %s",
+            (minid,self.epsilon)
         )
         pairs = {}
         i = 0
@@ -327,7 +335,7 @@ if __name__ == '__main__':
     parser.add_argument('--tweets',action='store_true',help="json dump tweets in clusters")
     parser.add_argument('--stats',action='store_true',help="json dump cluster stats")
     parser.add_argument('--best',action='store_true',help="json dump best cluster and tweet")
-    parser.add_argument('--interesting',action='store_true',help="json dump top tweets")
+    parser.add_argument('--interesting',type=float,help="json dump top tweets based on percentile")
     parser.add_argument('--keywords',type=int,help="json dump top N keywords for clusters")
     parser.add_argument('--daysback',type=int,default=2,help="base clusters on tweets newer than this")
     args = parser.parse_args()
@@ -347,8 +355,8 @@ if __name__ == '__main__':
                 'tweetid': dbscan.stats['toptweet'],
                 'tweetdata': dbscan.get_toptweet(),
             }, indent=4)
-        if args.interesting:
-            print json.dumps(dbscan.get_interesting(), indent=4)
+        if args.interesting is not None:
+            print json.dumps(dbscan.get_interesting(args.interesting), indent=4, sort_keys=True)
         if args.keywords > 0:
             dbscan.get_clusterterms(args.keywords)
             print json.dumps(dbscan.clusterterms, indent=4)

@@ -8,7 +8,9 @@ linkcount - number of common links
 
 other measures take too long to produce (e.g. tfidf)
 or seem not so useful for classification in this context (cosine) 
-bigrams, stemming and part of speech tagging were not found to improve results
+bigrams, stemming and part of speech tagging alone were not found to improve results
+have added bigrams to the word list to make comparisons more specific
+words and bigrams are weighted
 
 """
 from ygpairs import ygpairs
@@ -18,19 +20,24 @@ import json
 import traceback
 import sys
 import argparse
+import time
 
 SAVE_ME = 10000 # default number of pairs to collect before inserting
+INFINITY = 999
 
 class ygsim(ygcursors):
     """
     handles calculating similarity either using links
     or metrics related to words
     """
-    def __init__(self, ip, thread, savesz=SAVE_ME):
+    def __init__(self, ip, thread, wait=0.0, savesz=SAVE_ME, epsilon=None):
         super(ygsim, self).__init__()
         self.savesz = savesz
         self.ip = ip
         self.thread = thread
+        if epsilon is None: self.epsilon = 0.0
+        else: self.epsilon = epsilon
+        self.wait = wait
         self.load_words()
         self.load_linkcounts()
 
@@ -38,21 +45,26 @@ class ygsim(ygcursors):
         """
         simple way to compare two featuresets
         count the size of the intersection, then the union
+        enhanced by allowing separate weights for different kinds of terms
         result is |intersection|/(|union|-|intersection|)
+        unlike a true set multiple matches of the same word count
         """
-        intersection = 0
-        seen = {}
+        intersectiondict = {}
+        uniondict = {}
         for f1 in list1:
             for f2 in list2:
                 if f1 == f2: 
-                    if str(f1) not in seen:
-                        intersection += 1
-                seen[str(f2)] = True
-            seen[str(f1)] = True
-        union = float(len(seen.keys()))
+                    yglog.vprint(f1,'matched',list2[f2],list1[f1])
+                    intersectiondict[f2] = list2[f2]
+                uniondict[f2] = list2[f2]
+                uniondict[f1] = list1[f1]
 
+        intersection = sum(intersectiondict.values())
+        union = sum(uniondict.values())
+
+        yglog.vprint("intersection",intersection,"union",union)
         if intersection == union: 
-            return 1.0
+            return INFINITY
 
         if intersection > union: 
             raise(Exception(
@@ -103,7 +115,7 @@ class ygsim(ygcursors):
                         linkcounts[ids[i]] = {}
                     if ids[j] not in linkcounts[ids[i]]:
                         linkcounts[ids[i]][ids[j]] = 0
-                    linkcounts[ids[i]][ids[j]] += 1
+                    linkcounts[ids[i]][ids[j]] += INFINITY
         self.linkcounts = linkcounts
 
     def get_linkcount(self, id1, id2):
@@ -144,7 +156,7 @@ class ygsim(ygcursors):
         ins = self.getcursor()
         # jaccard seems to be the only useful one here
         ins.executemany(
-            "insert ignore into similarity "
+            "replace into similarity "
             "(id1,id2,jaccard,links) "
             "values (%s,%s,%s,%s) ",
             similarities
@@ -165,8 +177,10 @@ class ygsim(ygcursors):
             # most measures aren't working well with this data ...
             jaccard, linkcount = self.compare_two(id1, id2)
 
-            # filter out stuff where there is no relationship
-            if linkcount + jaccard > 0.0: 
+            # filter out stuff where there is no significant relationship
+            score = linkcount + jaccard
+            if (self.epsilon == 0.0 and score > self.epsilon) or \
+                    (self.epsilon > 0.0 and score >= self.epsilon): 
                 similarities.append((id1,id2,jaccard,linkcount))
                 yglog.vprint("similarity",(id1,id2,jaccard,linkcount))
 
@@ -206,13 +220,17 @@ class ygsim(ygcursors):
         if clean:
             self.clean_similarities() # deletes all similarity data
 
+        # sample = ygpairs.get_pairs(self.ip, self.thread)
+        pairs = ygpairs()
         sample = ygpairs.get_pairs(self.ip, self.thread)
         while len(sample) > 0:
-            self.compare_ids(sample)
+            if self.wait is not None: time.sleep(self.wait)
+            if len(sample) > 0:
+                self.compare_ids(sample)
 
-            if maxcount is not None:
-                maxcount -= len(sample)
-                if maxcount <= 0: break
+                if maxcount is not None:
+                    maxcount -= len(sample)
+                    if maxcount <= 0: break
 
             sample = ygpairs.get_pairs(self.ip, self.thread)
 
@@ -222,12 +240,14 @@ if __name__ == '__main__':
     )
     parser.add_argument('--ip',required=True,help='ip (or localhost) for this node')
     parser.add_argument('--thread',required=True,type=int,help="thread number for this node")
+    parser.add_argument('--epsilon',type=float,help="minimum similarity value for saving a pair")
+    parser.add_argument('--wait',type=float,help="wait time between samples")
     parser.add_argument('--clean',action='store_true',help="delete data in similarity table")
     parser.add_argument('--verbose',action='store_true',help="show lots of debug info")
     args = parser.parse_args()
 
     yglog.verbose = args.verbose
 
-    with ygsim(ip=args.ip, thread=args.thread) as sim:
+    with ygsim(ip=args.ip, thread=args.thread, wait=args.wait, epsilon=args.epsilon) as sim:
         sim.scan_pairs(clean=args.clean)
 

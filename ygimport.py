@@ -48,7 +48,7 @@ def save(tweet,ip=NOIP,thread=NOTHREAD):
         tweetid = data['id']
         created = data['created_at']
         ins.execute(
-            "insert ignore into tweets "
+            "replace into tweets "
             "(id,user,imported,created,raw,import_ip,import_thread) values "
             "(%s,%s,now(),%s,%s,%s,%s)",
             (tweetid, tweet['user'], created, raw, ip, thread)

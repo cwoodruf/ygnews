@@ -23,7 +23,7 @@ import math
 DEF_THRESHOLD = 0.5 # should be 0.0 to < 1.0
 SAVE_THRESHOLD = 10000 # how many pairs to save at a time
 MAX_TWEETS = 2000 # total maximum number of tweets to select from all sources
-PAIR_COUNT = 1000 # default number of pairs to return when a node requests a sample
+PAIR_COUNT = 10000 # default number of pairs to return when a node requests a sample
 
 def usage(parser):
     parser.print_usage()
@@ -189,9 +189,13 @@ class ygpairs(ygcursors):
                     "order by combined_count desc limit %s",
                     (user, limit)
                 )
+                upd = self.getcursor()
                 for row in getids:
                     ids.append(int(row[0]))
+                    upd.execute("update features set selected=date(now()) where id=%s", (row[0],))
                 getids.close()
+                self._commit()
+                upd.close()
 
             sorted(ids)
             pairs = []

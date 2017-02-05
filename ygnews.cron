@@ -1,5 +1,5 @@
 # modify and add the following lines to a crontab file to run the service
-10 * * * * $HOME/ygnews/ygnews.sh >> $HOME/ygnews/ygnews.out
+*/10 * * * * $HOME/ygnews/ygnews.sh >> $HOME/ygnews/ygnews.out 2>&1
 # cleanup old data
-30 1 * * * $HOME/ygnews/ygpurge.py >> $HOME/ygnews/ygnews.out
+30 1 * * * $HOME/ygnews/ygpurge.py >> $HOME/ygnews/ygnews.out 2>&1
 ### m h  dom mon dow   command

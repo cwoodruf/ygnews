@@ -1,8 +1,8 @@
--- MySQL dump 10.13  Distrib 5.5.53, for debian-linux-gnu (x86_64)
+-- MySQL dump 10.13  Distrib 5.5.54, for debian-linux-gnu (i686)
 --
--- Host: localhost    Database: ygnews_test
+-- Host: localhost    Database: ygnews
 -- ------------------------------------------------------
--- Server version	5.5.53-0ubuntu0.14.04.1-log
+-- Server version	5.5.54-0ubuntu0.12.04.1-log
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
@@ -30,15 +30,6 @@ CREATE TABLE `bigrams` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `bigrams`
---
-
-LOCK TABLES `bigrams` WRITE;
-/*!40000 ALTER TABLE `bigrams` DISABLE KEYS */;
-/*!40000 ALTER TABLE `bigrams` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
 -- Table structure for table `features`
 --
 
@@ -57,20 +48,13 @@ CREATE TABLE `features` (
   `combined_count` int(11) DEFAULT NULL,
   `created_at` datetime DEFAULT NULL,
   `processed` datetime DEFAULT NULL,
+  `selected` datetime DEFAULT NULL,
   `user` varchar(64) DEFAULT NULL,
   PRIMARY KEY (`id`),
-  UNIQUE KEY `features_words_idx` (`words`(255))
+  UNIQUE KEY `features_words_idx` (`words`(255)),
+  KEY `features_selected_idx` (`selected`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `features`
---
-
-LOCK TABLES `features` WRITE;
-/*!40000 ALTER TABLE `features` DISABLE KEYS */;
-/*!40000 ALTER TABLE `features` ENABLE KEYS */;
-UNLOCK TABLES;
 
 --
 -- Table structure for table `feeds`
@@ -88,16 +72,6 @@ CREATE TABLE `feeds` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `feeds`
---
-
-LOCK TABLES `feeds` WRITE;
-/*!40000 ALTER TABLE `feeds` DISABLE KEYS */;
-INSERT INTO `feeds` VALUES ('abc','localhost',1),('ajenglish','localhost',1),('ap','localhost',1),('bbcnews','localhost',1),('bostonglobe','localhost',1),('bw','localhost',1),('cnet','localhost',1),('cnn','localhost',1),('guardian','localhost',1),('independent','localhost',1),('latimes','localhost',1),('msnuk','localhost',1),('newscomauhq','localhost',1),('nytimes','localhost',1),('reutersagency','localhost',1),('sfgate','localhost',1),('skynews','localhost',1),('telegraph','localhost',1),('thetimes','localhost',1),('time','localhost',1),('usatoday','localhost',1),('washingtonpost','localhost',1),('wsj','localhost',1);
-/*!40000 ALTER TABLE `feeds` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
 -- Table structure for table `links`
 --
 
@@ -113,15 +87,6 @@ CREATE TABLE `links` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `links`
---
-
-LOCK TABLES `links` WRITE;
-/*!40000 ALTER TABLE `links` DISABLE KEYS */;
-/*!40000 ALTER TABLE `links` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
 -- Table structure for table `pairs`
 --
 
@@ -135,18 +100,10 @@ CREATE TABLE `pairs` (
   `processed` datetime DEFAULT NULL,
   `ip` varchar(64) DEFAULT NULL,
   `thread` int(11) DEFAULT NULL,
-  PRIMARY KEY (`id1`,`id2`)
+  PRIMARY KEY (`id1`,`id2`),
+  KEY `pairs_ip_thread_idx` (`ip`,`thread`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `pairs`
---
-
-LOCK TABLES `pairs` WRITE;
-/*!40000 ALTER TABLE `pairs` DISABLE KEYS */;
-/*!40000 ALTER TABLE `pairs` ENABLE KEYS */;
-UNLOCK TABLES;
 
 --
 -- Table structure for table `pairs_template`
@@ -162,18 +119,10 @@ CREATE TABLE `pairs_template` (
   `processed` datetime DEFAULT NULL,
   `ip` varchar(64) DEFAULT NULL,
   `thread` int(11) DEFAULT NULL,
-  PRIMARY KEY (`id1`,`id2`)
+  PRIMARY KEY (`id1`,`id2`),
+  KEY `pairs_ip_thread_idx` (`ip`,`thread`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `pairs_template`
---
-
-LOCK TABLES `pairs_template` WRITE;
-/*!40000 ALTER TABLE `pairs_template` DISABLE KEYS */;
-/*!40000 ALTER TABLE `pairs_template` ENABLE KEYS */;
-UNLOCK TABLES;
 
 --
 -- Table structure for table `similarity`
@@ -192,15 +141,6 @@ CREATE TABLE `similarity` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `similarity`
---
-
-LOCK TABLES `similarity` WRITE;
-/*!40000 ALTER TABLE `similarity` DISABLE KEYS */;
-/*!40000 ALTER TABLE `similarity` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
 -- Table structure for table `similarity_template`
 --
 
@@ -217,15 +157,6 @@ CREATE TABLE `similarity_template` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `similarity_template`
---
-
-LOCK TABLES `similarity_template` WRITE;
-/*!40000 ALTER TABLE `similarity_template` DISABLE KEYS */;
-/*!40000 ALTER TABLE `similarity_template` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
 -- Table structure for table `stopwords`
 --
 
@@ -238,16 +169,6 @@ CREATE TABLE `stopwords` (
   PRIMARY KEY (`term`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `stopwords`
---
-
-LOCK TABLES `stopwords` WRITE;
-/*!40000 ALTER TABLE `stopwords` DISABLE KEYS */;
-INSERT INTO `stopwords` VALUES ('a',875),('and',528),('as',191),('At',235),('for',502),('has',199),('his',254),('in',855),('Is',430),('it',213),('of',823),('on',466),('RT',387),('s',725),('says',211),('that',193),('the',1358),('to',1166),('with',304),('you',195);
-/*!40000 ALTER TABLE `stopwords` ENABLE KEYS */;
-UNLOCK TABLES;
 
 --
 -- Table structure for table `tweetbigrams`
@@ -263,15 +184,6 @@ CREATE TABLE `tweetbigrams` (
   PRIMARY KEY (`id`,`term`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `tweetbigrams`
---
-
-LOCK TABLES `tweetbigrams` WRITE;
-/*!40000 ALTER TABLE `tweetbigrams` DISABLE KEYS */;
-/*!40000 ALTER TABLE `tweetbigrams` ENABLE KEYS */;
-UNLOCK TABLES;
 
 --
 -- Table structure for table `tweets`
@@ -297,15 +209,6 @@ CREATE TABLE `tweets` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `tweets`
---
-
-LOCK TABLES `tweets` WRITE;
-/*!40000 ALTER TABLE `tweets` DISABLE KEYS */;
-/*!40000 ALTER TABLE `tweets` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
 -- Table structure for table `tweetwords`
 --
 
@@ -319,15 +222,6 @@ CREATE TABLE `tweetwords` (
   PRIMARY KEY (`id`,`term`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `tweetwords`
---
-
-LOCK TABLES `tweetwords` WRITE;
-/*!40000 ALTER TABLE `tweetwords` DISABLE KEYS */;
-/*!40000 ALTER TABLE `tweetwords` ENABLE KEYS */;
-UNLOCK TABLES;
 
 --
 -- Temporary table structure for view `user_features`
@@ -374,15 +268,6 @@ CREATE TABLE `userids` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `userids`
---
-
-LOCK TABLES `userids` WRITE;
-/*!40000 ALTER TABLE `userids` DISABLE KEYS */;
-/*!40000 ALTER TABLE `userids` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
 -- Table structure for table `users`
 --
 
@@ -401,15 +286,6 @@ CREATE TABLE `users` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `users`
---
-
-LOCK TABLES `users` WRITE;
-/*!40000 ALTER TABLE `users` DISABLE KEYS */;
-/*!40000 ALTER TABLE `users` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
 -- Table structure for table `words`
 --
 
@@ -422,15 +298,6 @@ CREATE TABLE `words` (
   PRIMARY KEY (`term`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `words`
---
-
-LOCK TABLES `words` WRITE;
-/*!40000 ALTER TABLE `words` DISABLE KEYS */;
-/*!40000 ALTER TABLE `words` ENABLE KEYS */;
-UNLOCK TABLES;
 
 --
 -- Final view structure for view `user_features`
@@ -460,4 +327,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2017-01-15 21:29:03
+-- Dump completed on 2017-02-05 11:14:10
