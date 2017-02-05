@@ -1,10 +1,6 @@
 # ygnews
 ## Twitter news feed clustering service
 
-
-Date: 2017-01-15
-Author: Cal Woodruff cwoodruf@sfu.ca, cwoodruf@gmail.com, 778 232 5078
-
 The software in this directory is an implementation of a service for gathering
 news tweets, clustering them and saving tweets representing newsworthy clusters.
 
