@@ -1,0 +1,463 @@
+-- MySQL dump 10.13  Distrib 5.5.53, for debian-linux-gnu (x86_64)
+--
+-- Host: localhost    Database: ygnews_test
+-- ------------------------------------------------------
+-- Server version	5.5.53-0ubuntu0.14.04.1-log
+
+/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
+/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
+/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
+/*!40101 SET NAMES utf8 */;
+/*!40103 SET @OLD_TIME_ZONE=@@TIME_ZONE */;
+/*!40103 SET TIME_ZONE='+00:00' */;
+/*!40014 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0 */;
+/*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
+/*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
+/*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
+
+--
+-- Table structure for table `bigrams`
+--
+
+DROP TABLE IF EXISTS `bigrams`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `bigrams` (
+  `term` varchar(128) NOT NULL,
+  `num` int(11) NOT NULL DEFAULT '1',
+  PRIMARY KEY (`term`)
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `bigrams`
+--
+
+LOCK TABLES `bigrams` WRITE;
+/*!40000 ALTER TABLE `bigrams` DISABLE KEYS */;
+/*!40000 ALTER TABLE `bigrams` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `features`
+--
+
+DROP TABLE IF EXISTS `features`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `features` (
+  `id` bigint(20) NOT NULL,
+  `lang` varchar(8) DEFAULT NULL,
+  `favorite_count` int(11) DEFAULT NULL,
+  `retweet_count` int(11) DEFAULT NULL,
+  `words` text,
+  `rawtext` text,
+  `stemmed` text,
+  `pos` text,
+  `combined_count` int(11) DEFAULT NULL,
+  `created_at` datetime DEFAULT NULL,
+  `processed` datetime DEFAULT NULL,
+  `user` varchar(64) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `features_words_idx` (`words`(255))
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `features`
+--
+
+LOCK TABLES `features` WRITE;
+/*!40000 ALTER TABLE `features` DISABLE KEYS */;
+/*!40000 ALTER TABLE `features` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `feeds`
+--
+
+DROP TABLE IF EXISTS `feeds`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `feeds` (
+  `user` varchar(64) NOT NULL,
+  `ip` varchar(64) DEFAULT NULL,
+  `thread` int(11) DEFAULT NULL,
+  PRIMARY KEY (`user`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `feeds`
+--
+
+LOCK TABLES `feeds` WRITE;
+/*!40000 ALTER TABLE `feeds` DISABLE KEYS */;
+INSERT INTO `feeds` VALUES ('abc','localhost',1),('ajenglish','localhost',1),('ap','localhost',1),('bbcnews','localhost',1),('bostonglobe','localhost',1),('bw','localhost',1),('cnet','localhost',1),('cnn','localhost',1),('guardian','localhost',1),('independent','localhost',1),('latimes','localhost',1),('msnuk','localhost',1),('newscomauhq','localhost',1),('nytimes','localhost',1),('reutersagency','localhost',1),('sfgate','localhost',1),('skynews','localhost',1),('telegraph','localhost',1),('thetimes','localhost',1),('time','localhost',1),('usatoday','localhost',1),('washingtonpost','localhost',1),('wsj','localhost',1);
+/*!40000 ALTER TABLE `feeds` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `links`
+--
+
+DROP TABLE IF EXISTS `links`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `links` (
+  `id` bigint(20) NOT NULL DEFAULT '0',
+  `link` varchar(128) NOT NULL DEFAULT '',
+  `source` varchar(32) DEFAULT NULL,
+  PRIMARY KEY (`id`,`link`)
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `links`
+--
+
+LOCK TABLES `links` WRITE;
+/*!40000 ALTER TABLE `links` DISABLE KEYS */;
+/*!40000 ALTER TABLE `links` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `pairs`
+--
+
+DROP TABLE IF EXISTS `pairs`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `pairs` (
+  `id1` bigint(20) NOT NULL DEFAULT '0',
+  `id2` bigint(20) NOT NULL DEFAULT '0',
+  `added` datetime DEFAULT NULL,
+  `processed` datetime DEFAULT NULL,
+  `ip` varchar(64) DEFAULT NULL,
+  `thread` int(11) DEFAULT NULL,
+  PRIMARY KEY (`id1`,`id2`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `pairs`
+--
+
+LOCK TABLES `pairs` WRITE;
+/*!40000 ALTER TABLE `pairs` DISABLE KEYS */;
+/*!40000 ALTER TABLE `pairs` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `pairs_template`
+--
+
+DROP TABLE IF EXISTS `pairs_template`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `pairs_template` (
+  `id1` bigint(20) NOT NULL DEFAULT '0',
+  `id2` bigint(20) NOT NULL DEFAULT '0',
+  `added` datetime DEFAULT NULL,
+  `processed` datetime DEFAULT NULL,
+  `ip` varchar(64) DEFAULT NULL,
+  `thread` int(11) DEFAULT NULL,
+  PRIMARY KEY (`id1`,`id2`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `pairs_template`
+--
+
+LOCK TABLES `pairs_template` WRITE;
+/*!40000 ALTER TABLE `pairs_template` DISABLE KEYS */;
+/*!40000 ALTER TABLE `pairs_template` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `similarity`
+--
+
+DROP TABLE IF EXISTS `similarity`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `similarity` (
+  `id1` bigint(20) NOT NULL DEFAULT '0',
+  `id2` bigint(20) NOT NULL DEFAULT '0',
+  `jaccard` float DEFAULT NULL,
+  `links` float DEFAULT '0',
+  PRIMARY KEY (`id1`,`id2`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `similarity`
+--
+
+LOCK TABLES `similarity` WRITE;
+/*!40000 ALTER TABLE `similarity` DISABLE KEYS */;
+/*!40000 ALTER TABLE `similarity` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `similarity_template`
+--
+
+DROP TABLE IF EXISTS `similarity_template`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `similarity_template` (
+  `id1` bigint(20) NOT NULL DEFAULT '0',
+  `id2` bigint(20) NOT NULL DEFAULT '0',
+  `jaccard` float DEFAULT NULL,
+  `links` float DEFAULT '0',
+  PRIMARY KEY (`id1`,`id2`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `similarity_template`
+--
+
+LOCK TABLES `similarity_template` WRITE;
+/*!40000 ALTER TABLE `similarity_template` DISABLE KEYS */;
+/*!40000 ALTER TABLE `similarity_template` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `stopwords`
+--
+
+DROP TABLE IF EXISTS `stopwords`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `stopwords` (
+  `term` varchar(128) NOT NULL DEFAULT '',
+  `num` int(11) NOT NULL DEFAULT '1',
+  PRIMARY KEY (`term`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `stopwords`
+--
+
+LOCK TABLES `stopwords` WRITE;
+/*!40000 ALTER TABLE `stopwords` DISABLE KEYS */;
+INSERT INTO `stopwords` VALUES ('a',875),('and',528),('as',191),('At',235),('for',502),('has',199),('his',254),('in',855),('Is',430),('it',213),('of',823),('on',466),('RT',387),('s',725),('says',211),('that',193),('the',1358),('to',1166),('with',304),('you',195);
+/*!40000 ALTER TABLE `stopwords` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `tweetbigrams`
+--
+
+DROP TABLE IF EXISTS `tweetbigrams`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `tweetbigrams` (
+  `id` bigint(20) NOT NULL DEFAULT '0',
+  `term` varchar(128) NOT NULL DEFAULT '',
+  `num` int(11) NOT NULL DEFAULT '1',
+  PRIMARY KEY (`id`,`term`)
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `tweetbigrams`
+--
+
+LOCK TABLES `tweetbigrams` WRITE;
+/*!40000 ALTER TABLE `tweetbigrams` DISABLE KEYS */;
+/*!40000 ALTER TABLE `tweetbigrams` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `tweets`
+--
+
+DROP TABLE IF EXISTS `tweets`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `tweets` (
+  `id` bigint(20) NOT NULL,
+  `user` varchar(64) DEFAULT NULL,
+  `imported` datetime DEFAULT NULL,
+  `created` varchar(32) DEFAULT NULL,
+  `raw` text,
+  `scanned` int(11) DEFAULT '0',
+  `import_ip` varchar(64) DEFAULT NULL,
+  `import_thread` int(11) DEFAULT NULL,
+  `processing_ip` varchar(64) DEFAULT NULL,
+  `processing_thread` int(11) DEFAULT NULL,
+  `processed` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `tweets`
+--
+
+LOCK TABLES `tweets` WRITE;
+/*!40000 ALTER TABLE `tweets` DISABLE KEYS */;
+/*!40000 ALTER TABLE `tweets` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `tweetwords`
+--
+
+DROP TABLE IF EXISTS `tweetwords`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `tweetwords` (
+  `id` bigint(20) NOT NULL DEFAULT '0',
+  `term` varchar(128) NOT NULL DEFAULT '',
+  `num` int(11) NOT NULL DEFAULT '1',
+  PRIMARY KEY (`id`,`term`)
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `tweetwords`
+--
+
+LOCK TABLES `tweetwords` WRITE;
+/*!40000 ALTER TABLE `tweetwords` DISABLE KEYS */;
+/*!40000 ALTER TABLE `tweetwords` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Temporary table structure for view `user_features`
+--
+
+DROP TABLE IF EXISTS `user_features`;
+/*!50001 DROP VIEW IF EXISTS `user_features`*/;
+SET @saved_cs_client     = @@character_set_client;
+SET character_set_client = utf8;
+/*!50001 CREATE TABLE `user_features` (
+  `screen_name` tinyint NOT NULL,
+  `favourites_count` tinyint NOT NULL,
+  `followers_count` tinyint NOT NULL,
+  `statuses_count` tinyint NOT NULL,
+  `modified` tinyint NOT NULL,
+  `combined_av` tinyint NOT NULL,
+  `id` tinyint NOT NULL,
+  `lang` tinyint NOT NULL,
+  `favorite_count` tinyint NOT NULL,
+  `retweet_count` tinyint NOT NULL,
+  `words` tinyint NOT NULL,
+  `rawtext` tinyint NOT NULL,
+  `stemmed` tinyint NOT NULL,
+  `pos` tinyint NOT NULL,
+  `combined_count` tinyint NOT NULL,
+  `created_at` tinyint NOT NULL,
+  `processed` tinyint NOT NULL,
+  `user` tinyint NOT NULL
+) ENGINE=MyISAM */;
+SET character_set_client = @saved_cs_client;
+
+--
+-- Table structure for table `userids`
+--
+
+DROP TABLE IF EXISTS `userids`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `userids` (
+  `id` bigint(20) NOT NULL DEFAULT '0',
+  `userid` varchar(128) NOT NULL DEFAULT '',
+  PRIMARY KEY (`id`,`userid`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `userids`
+--
+
+LOCK TABLES `userids` WRITE;
+/*!40000 ALTER TABLE `userids` DISABLE KEYS */;
+/*!40000 ALTER TABLE `userids` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `users`
+--
+
+DROP TABLE IF EXISTS `users`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `users` (
+  `screen_name` varchar(64) NOT NULL,
+  `favourites_count` bigint(20) DEFAULT '0',
+  `followers_count` bigint(20) DEFAULT '0',
+  `statuses_count` bigint(20) DEFAULT '0',
+  `modified` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `combined_av` float DEFAULT NULL,
+  PRIMARY KEY (`screen_name`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `users`
+--
+
+LOCK TABLES `users` WRITE;
+/*!40000 ALTER TABLE `users` DISABLE KEYS */;
+/*!40000 ALTER TABLE `users` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `words`
+--
+
+DROP TABLE IF EXISTS `words`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `words` (
+  `term` varchar(128) NOT NULL DEFAULT '',
+  `num` int(11) NOT NULL DEFAULT '1',
+  PRIMARY KEY (`term`)
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `words`
+--
+
+LOCK TABLES `words` WRITE;
+/*!40000 ALTER TABLE `words` DISABLE KEYS */;
+/*!40000 ALTER TABLE `words` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Final view structure for view `user_features`
+--
+
+/*!50001 DROP TABLE IF EXISTS `user_features`*/;
+/*!50001 DROP VIEW IF EXISTS `user_features`*/;
+/*!50001 SET @saved_cs_client          = @@character_set_client */;
+/*!50001 SET @saved_cs_results         = @@character_set_results */;
+/*!50001 SET @saved_col_connection     = @@collation_connection */;
+/*!50001 SET character_set_client      = utf8 */;
+/*!50001 SET character_set_results     = utf8 */;
+/*!50001 SET collation_connection      = utf8_general_ci */;
+/*!50001 CREATE ALGORITHM=UNDEFINED */
+/*!50013 DEFINER=`ygnews`@`localhost` SQL SECURITY DEFINER */
+/*!50001 VIEW `user_features` AS select `users`.`screen_name` AS `screen_name`,`users`.`favourites_count` AS `favourites_count`,`users`.`followers_count` AS `followers_count`,`users`.`statuses_count` AS `statuses_count`,`users`.`modified` AS `modified`,`users`.`combined_av` AS `combined_av`,`features`.`id` AS `id`,`features`.`lang` AS `lang`,`features`.`favorite_count` AS `favorite_count`,`features`.`retweet_count` AS `retweet_count`,`features`.`words` AS `words`,`features`.`rawtext` AS `rawtext`,`features`.`stemmed` AS `stemmed`,`features`.`pos` AS `pos`,`features`.`combined_count` AS `combined_count`,`features`.`created_at` AS `created_at`,`features`.`processed` AS `processed`,`features`.`user` AS `user` from (`users` join `features` on((`users`.`screen_name` = `features`.`user`))) */;
+/*!50001 SET character_set_client      = @saved_cs_client */;
+/*!50001 SET character_set_results     = @saved_cs_results */;
+/*!50001 SET collation_connection      = @saved_col_connection */;
+/*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
+
+/*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
+/*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
+/*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */;
+/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
+/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
+/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
+/*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
+
+-- Dump completed on 2017-01-15 21:29:03
