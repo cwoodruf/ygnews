@@ -190,6 +190,7 @@ class ygpairs(ygcursors):
                     (user, limit)
                 )
                 upd = self.getcursor()
+                upd.execute("update features set selected=null where selected is not null")
                 for row in getids:
                     ids.append(int(row[0]))
                     upd.execute("update features set selected=date(now()) where id=%s", (row[0],))
