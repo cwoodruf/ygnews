@@ -15,6 +15,8 @@ def conn(db=ygnewsdb):
         user=db['user'], 
         passwd=db['pw']
     )
+    cursor = connection.cursor()
+    cursor.execute("set session transaction isolation level repeatable read")
     return connection
 
 if __name__ == '__main__':

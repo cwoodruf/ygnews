@@ -124,6 +124,7 @@ class ygdbscan(ygcursors):
                 clusterid = stats['clusterids'][clidx]
                 twidx = stats['besttweetidx'][clidx]
                 interesting[clusterid] = clustertweets[clusterid][twidx]
+                interesting[clusterid]['count'] = len(clustertweets[clusterid])
         return interesting
 
     def get_toptweet(self):
