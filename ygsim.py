@@ -63,6 +63,8 @@ class ygsim(ygcursors):
         union = sum(uniondict.values())
 
         yglog.vprint("intersection",intersection,"union",union)
+        if union == 0:
+            return 0
         if intersection == union: 
             return INFINITY
 

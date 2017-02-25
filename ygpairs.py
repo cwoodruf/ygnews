@@ -166,8 +166,7 @@ class ygpairs(ygcursors):
             get.execute(
                 "select user,count(*) from user_features "
                 "where combined_count/combined_av > %s "
-                "group by user",
-                (threshold,)
+                "group by user", (threshold,)
             )
             alltweets = 0
             tweetcounts = {}
@@ -180,6 +179,10 @@ class ygpairs(ygcursors):
 
             maxtweets = mt if mt > 0 else self.maxtweets
             ids = []
+            upd = self.getcursor()
+            upd.execute("update features set selected=null where selected is not null")
+            upd.close()
+            self._commit()
             for user, tweetcount in tweetcounts.iteritems():
                 limit = math.ceil(float(maxtweets) * float(tweetcount)/float(alltweets))
                 yglog.vprint("user",user,"limit",limit,"out of",maxtweets,"all",alltweets,"count",tweetcount)
@@ -190,7 +193,6 @@ class ygpairs(ygcursors):
                     (user, limit)
                 )
                 upd = self.getcursor()
-                upd.execute("update features set selected=null where selected is not null")
                 for row in getids:
                     ids.append(int(row[0]))
                     upd.execute("update features set selected=date(now()) where id=%s", (row[0],))
