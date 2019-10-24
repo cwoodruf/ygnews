@@ -91,7 +91,7 @@ ygnews.sh script finished in about 1 minute.
 
 ## TODO:
 
-* unit and functional tests
+* this was an experiment to see what the performance effects of using a relational database would be, some operations (such as pair generation and comparison) should be implemented with a suitable queuing technology to improve scalability
 * port db to postgres - InnoDB was extremely slow for some operations
 * create stored procedures for some common actions (e.g. the summarize function in ygfeatures.py or the calls in ygpurge.py)
 
